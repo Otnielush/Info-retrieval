@@ -1,7 +1,7 @@
 import pytube
 import pandas as pd
 import numpy as np
-import youtubesearchpython  as ys
+import youtubesearchpython as ys
 import datetime
 
 
@@ -9,7 +9,7 @@ import datetime
 #out: array of videos are scrubbed from search page
 def search_1(sentence, num_of_results=50):
     # videosSearch = ys.Search(search, limit=50, region='IS')
-    videosSearch = ys.VideosSearch(search, region='IS')
+    videosSearch = ys.VideosSearch(sentence, region='IS')
     array_results = []
     for i in range(num_of_results//20 + 1):
         page = videosSearch.result()['result']
@@ -21,6 +21,7 @@ def search_1(sentence, num_of_results=50):
             a_timedelta = date_time - datetime.datetime(1900, 1, 1)
             seconds = a_timedelta.total_seconds()
             p['duration'] = int(seconds)
+            p['viewCount']['text'] = p['viewCount']['text'][:-6].replace(',', '')
         array_results.extend(page)
 
         videosSearch.next()
