@@ -1,8 +1,8 @@
 from pytube import YouTube
 
 
-#in: youtube links; number how much to parse
-#out: youtube objects of parsed videos
+# in: youtube links; number how much to parse
+# out: youtube objects of parsed videos
 def you_parse(yt_links, num_to_parse):
     results = []
     for i in range(num_to_parse):
@@ -18,6 +18,5 @@ def you_parse(yt_links, num_to_parse):
                 connects += 1
 
     print('\rParsing done')
-
 
     return results

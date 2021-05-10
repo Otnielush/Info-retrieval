@@ -5,8 +5,8 @@ import youtubesearchpython as ys
 import datetime
 
 
-#in: sentence to search in youtube
-#out: array of videos are scrubbed from search page
+# in: sentence to search in youtube
+# out: array of videos are scrubbed from search page
 def search_1(sentence, num_of_results=50):
     # videosSearch = ys.Search(search, limit=50, region='IS')
     videosSearch = ys.VideosSearch(sentence, region='IS')
@@ -30,7 +30,7 @@ def search_1(sentence, num_of_results=50):
             else:
                 p['viewCount']['text'] = 0
 
-        # TODO if views and duration = 0 it`s most likely life stream and we don`t need it
+        # TODO if views and duration = 0 it`s most likely live stream and we don`t need it
         array_results.extend(page)
 
         videosSearch.next()
