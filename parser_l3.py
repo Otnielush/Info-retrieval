@@ -8,6 +8,9 @@ def you_parse(yt_links):
     for i, link in enumerate(yt_links):
         print('\rParsing:', i+1, 'of', len(yt_links), end='')
 
+        if len(link) <= 11:
+            link = 'https://www.youtube.com/watch?v='+link
+
         connects = 0
         while connects < 3:
             try:
@@ -17,7 +20,7 @@ def you_parse(yt_links):
             except:
                 connects += 1
 
-    print('\rParsing done')
+    print('\b\b\b\b\b\b\rParsing done')
 
     return results
 
