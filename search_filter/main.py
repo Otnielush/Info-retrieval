@@ -8,7 +8,7 @@ from filter_2 import filter_2
 import sys
 
 
-MAX_VIDEOS_TO_PARSE = 10
+MAX_VIDEOS_TO_PARSE = 15
 
 #read sentence to search from console
 if len(sys.argv) < 2:
