@@ -3,36 +3,30 @@ import pandas as pd
 import numpy as np
 import youtubesearchpython as ys
 import datetime
+from youtube_transcript_api import YouTubeTranscriptApi
 
+
+y_link = 'https://www.youtube.com/watch?v='
 
 # in: sentence to search in youtube
-# out: array of videos are scrubbed from search page
+# out: arrays of ids and  subtitles
 def search_yt(sentence, num_of_results=50):
-    # videosSearch = ys.Search(search, limit=50, region='IS')
     videosSearch = ys.VideosSearch(sentence, region='IS')
-    array_results = []
-    for i in range(num_of_results//20 + 1):
+    ids = []
+    subtitles = []
+
+    for i in range(3):
         page = videosSearch.result()['result']
         for p in page:
-            if p['duration']:
-                if len(p['duration'].split(':')) > 2:
-                    date_time = datetime.datetime.strptime(p['duration'], '%H:%M:%S')
-                else:
-                    date_time = datetime.datetime.strptime(p['duration'], '%M:%S')
-                a_timedelta = date_time - datetime.datetime(1900, 1, 1)
-                seconds = a_timedelta.total_seconds()
-                p['duration'] = int(seconds)
-            else:
-                p['duration'] = 0
-
-            if p['viewCount']['text']:
-                p['viewCount']['text'] = int(p['viewCount']['text'][:-6].replace(',', ''))
-            else:
-                p['viewCount']['text'] = 0
-
-        # TODO if views and duration = 0 it`s most likely live stream and we don`t need it
-        array_results.extend(page)
+            # downloading subtitles if exists
+            try:
+                subtitles.append(YouTubeTranscriptApi.get_transcripts([p['id']], languages=['en'])[0][p['id']])
+                ids.append(p['id'])
+            except:
+                continue
+            if len(ids) >= num_of_results:
+                return ids, subtitles
 
         videosSearch.next()
 
-    return array_results[:num_of_results]
+    return ids, subtitles
