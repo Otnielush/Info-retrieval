@@ -45,5 +45,3 @@ def filter_2(search_sentence, yt_objects):
 
     return sorted(yt_objects, key=lambda x: x.similarity, reverse=True)
 
-
-
