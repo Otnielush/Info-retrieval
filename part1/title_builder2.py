@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from spacy.lang.en import English
 nlp = English()
+
 from ngrams import Word_Frequency
 ngrams = Word_Frequency()
 
@@ -11,7 +12,7 @@ ngrams = Word_Frequency()
 # IN: text
 # OUT: subtitles
 
-def build_subtitles(text, window=None, max_words=6):
+def build_subtitles(text, window=None, max_words=10):
 
     if type(text) == str:
         text = [text]
@@ -20,10 +21,11 @@ def build_subtitles(text, window=None, max_words=6):
     for t in range(len(text)):
         if type(text[t]) == list:
             text[t] = ' '.join(text[t])
-        text[t] = text[t].replace('\n',' ').replace('\t','').rstrip().lstrip()
+        text[t] = text[t].replace('\n',' ').replace('\t','').replace("'s ",' ').replace("'ll ",' will ').replace("'re ", ' are ').replace("n't ", ' not ').replace("'ve ", " have ").replace("'m", " am")
         text[t] = re.sub('[,\.!?]', '', text[t])
-        text[t] = re.sub('[_]', ' ', text[t])
+        text[t] = re.sub('[_-]', ' ', text[t])
         text[t] = re.sub('(\s){2,8}', ' ', text[t])
+        text[t] = text[t].rstrip().lstrip()
         # Convert the titles to lowercase
         text[t] = text[t].lower()
 
@@ -102,37 +104,50 @@ def build_subtitles(text, window=None, max_words=6):
     table_most_appearance_words = [[[row2word[ind] for ind in step] for step in doc] for doc in table_most_appearance]
 
 
+    data = [{'app_freq':0, 'app_freq_f':0, 'app_freq_w':0, 'most_app':0, 'most_words':0} for _ in range(len(docs))]
     # save results to csv
     for i,table in enumerate(table_appearance_freq):
         dataset = pd.DataFrame(table.T, columns=word2row.keys())
         dataset.to_csv(f'result_words_{i}.csv', index=None)
+        data[i]['app_freq'] = dataset
+
+        # dataset with One Hot encoding for most frequent words
+        dataset_filtered = dataset.copy(True)
+        for j in range(dataset_filtered.shape[0]):
+            limit = sorted(dataset_filtered.loc[j], reverse=True)[max_words]
+            dataset_filtered.loc[j] = (dataset_filtered.loc[j] > limit) * 1
+        data[i]['app_freq_f'] = dataset_filtered.fillna(0)
+
 
     for i,table in enumerate(table_most_appearance):
         dataset = pd.DataFrame(table, columns=[str(x) for x in range(1,max_words+1)])
         dataset.to_csv(f'result_best_ind_{i}.csv', index=None)
+        data[i]['most_app'] = dataset
 
     for i,table in enumerate(table_most_appearance_words):
         dataset = pd.DataFrame(table, columns=[str(x) for x in range(1,max_words+1)])
         dataset.to_csv(f'result_best_words_{i}.csv', index=None)
+        data[i]['most_words'] = dataset
+
 
     # print(dataset)
     # print(dict_words['woke']/total_words, ngrams.get_frequency(['woke']))
+    return data
 
 
 
 if __name__ == '__main__':
 
-    q = 1
+    q = 2
 
     if q == 1:
         with open('../data_test/kb04.cha', 'r') as f:
             file1 = f.readlines()
-        with open('../data_test/kb05.cha', 'r') as f:
-            file2 = f.readlines()
+
     else:
-        text = [1,2,3,7,9,6,5,4,2,5,5,3,4,5,3,6,8,9,6,4,2,3,7,8,8,3,1,3,4,6,7,8,0,1,4,6,8,8,0,1,4,6,5,0,7,8,6,7,8,6,7,9,2,3,3,4,3,1,4,1,1,3]
-        file1 = ' '.join([str(x) for x in text])
-        file2 = ' '.join([str(x) for x in text[:len(text)//2]])
-    build_subtitles([file1, file2], window=100, max_words=10)
+        file1 = pd.read_csv('../data_test/text.csv')
+        file1 = list(file1['text'])
+
+    build_subtitles([file1], window=30, max_words=10)
     print(ngrams)
 

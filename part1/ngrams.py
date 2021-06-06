@@ -153,9 +153,9 @@ class Word_Frequency():
         return self._get_data_f_script(gm)
 
     def __repr__(self):
-        rep = ''
+        rep = f'dict size: {len(self.tokens)}\n'
         for i, key in enumerate(self.tokens):
-            if i == 10:
+            if i == 100:
                 rep += '  ...  '
                 break
             else:
