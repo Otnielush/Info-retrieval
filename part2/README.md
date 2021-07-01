@@ -6,3 +6,5 @@
 * Groups are compared for similarity to the query
 * From suitable groups (parts of text), pointers are created in the text and in the video
 * Video construction 
+
+_Run code:_ python main.py "searching words"
