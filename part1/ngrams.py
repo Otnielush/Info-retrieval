@@ -8,7 +8,7 @@ import re
 
 class Word_Frequency():
     def __init__(self):
-        self.path2db = os.path.abspath(os.path.join( os.path.abspath(__file__), os.pardir, 'ngrams.db'))
+        self.path2db = os.path.abspath(os.path.join(os.path.abspath(__file__), os.pardir, 'ngrams.db'))
         if not os.path.isfile(self.path2db):
             con = sql.connect('ngrams.db')
             command = 'CREATE TABLE word_freq (word TEXT UNIQUE NOT NULL, frequency INTEGER NOT NULL)'
@@ -101,12 +101,12 @@ class Word_Frequency():
 
         freqs = np.zeros((len(tokens)))
 
-        n_words = 12
+        n_words = 11
         start = 0
         stop = int(len(tokens) / n_words + 1)
         step = n_words
         num_problems = 0
-        print('Parsing ngrams frequencies')
+        print('\rParsing ngrams frequencies')
         print('00.00%', end='')
         for i in np.arange(start, stop, 1):
             if (i + 1) * n_words > len(tokens):
@@ -115,10 +115,16 @@ class Word_Frequency():
                 freqs[i * n_words:i * n_words + step] = self._parse_frequency(tokens[i * n_words:i * n_words + step])
                 num_problems = 0
             except:
-                print('\n', i, 'with problems', tokens[i * n_words:i * n_words + step])
-                num_problems += 1
-                if num_problems >= 3:
-                    break
+                for bb in np.arange(i * n_words, i * n_words + step, 1):
+                    try:
+                        freqs[bb] = self._parse_frequency(tokens[bb])[0]
+                        # print(' parsed',tokens[bb], freqs[bb])
+                        num_problems = 0
+                    except:
+                        print('\r',i, f'with problems ({tokens[bb]})')
+                        num_problems += 1
+                    if num_problems >= 3:
+                        break
 
             sleep(3)
             print('\r{:2.2f}%          i = {}'.format(i / stop * 100, i), end='')
@@ -126,7 +132,7 @@ class Word_Frequency():
             if (i + 1) % 30 == 0:
                 print('\r{:2.2f}% sleeping i = {}'.format(i / stop * 100, i), end='')
                 sleep(70)
-        print('\r Done')
+        print('\r Done', ' '*15)
         return freqs
 
     # Getting frequency for each word from google ngrams viewer
@@ -144,7 +150,7 @@ class Word_Frequency():
     def _parse_frequency(self, words):
         if (type(words) == list or type(words) == np.ndarray) and len(words) > 1:
             words = '%2C'.join(words)
-        url = 'https://books.google.com/ngrams/graph?content={}&year_start=1999&year_end=2000&corpus=15&smoothing=3'.format(
+        url = 'https://books.google.com/ngrams/graph?content={}&year_start=1999&year_end=2000&smoothing=3'.format(
             words)
 
         html = requests.get(url)

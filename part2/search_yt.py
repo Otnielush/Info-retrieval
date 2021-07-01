@@ -24,15 +24,16 @@ class YT_searcher():
         for i in range(3) or full:
             page = videosSearch.result()['result']
             for p in page:
-                # downloading subtitles if exists
-                try:
-                    self.subtitles.append(YouTubeTranscriptApi.get_transcripts([p['id']], languages=['en'])[0][p['id']])
-                    self.ids.append(p['id'])
-                except:
-                    continue
                 if len(self.ids) >= num_of_results:
                     full = True
                     break
+                # downloading subtitles if exists
+                subtitles = self._download_subtitles(p['id'])
+                if subtitles != None:
+                    self.subtitles.append(subtitles)
+                    self.ids.append(p['id'])
+                else:
+                    continue
 
             videosSearch.next()
 
@@ -49,3 +50,23 @@ class YT_searcher():
             data['duration'] = [tt['duration'] for tt in st]
             self.DFs.append(data)
             del(data)
+
+    def _download_subtitles(self, id_youtube):
+        try:
+            subs = YouTubeTranscriptApi.get_transcripts([id_youtube], languages=['en'])[0][id_youtube]
+        except Exception as e:
+            print('Error with downloading subtitles') #, e)
+            subs = None
+        return subs
+
+
+    def download_subtitles(self, id_youtube):
+        self.ids = []
+        self.subtitles = []
+        data = self._download_subtitles(id_youtube)
+        if data != None:
+            self.subtitles.append(data)
+            self._convert2pandas()
+            return self.DFs
+        else:
+            return None

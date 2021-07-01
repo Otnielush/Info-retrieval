@@ -1,11 +1,6 @@
 #!/usr/bin/python
 
-from search_yt import search_yt
-
 import sys
-
-
-MAX_VIDEOS_TO_PARSE = 15
 
 #read sentence to search from console
 if len(sys.argv) < 2:
@@ -14,17 +9,32 @@ if len(sys.argv) < 2:
 else:
     search_sentence = ' '.join(sys.argv[1:])
 print('Searching:', search_sentence)
+
+
+from search_yt import YT_searcher
+from title_filter import get_best_parts, build_plots
+
+
+sys.path.append('..')
+YT = YT_searcher()
+from part1.title_builder2 import build_subtitles
+
+MAX_VIDEOS_TO_PARSE = 2
+
 # step 1
-search_results = search_yt(search_sentence, MAX_VIDEOS_TO_PARSE)
-print('Videos found:', len(search_results))
+ids, df_subtitles = YT.search(search_sentence, MAX_VIDEOS_TO_PARSE)
 
-#step 2
-# sorted_youtube_links = filter_1(search_sentence, search_results)
+print('Videos found:', len(ids))
 
-#step 3
-# parsed_array = you_parse(sorted_youtube_links, MAX_VIDEOS_TO_PARSE)
+# step 2
+data = build_subtitles([list(df['text']) for df in df_subtitles], window=100, max_words=7, parse_text_parts=True)
 
+# step 3
+best_part, best_part_timings = get_best_parts(data, search_sentence, df_subtitles)
+build_plots(data)
+
+print(f'{best_part = }\n{best_part_timings = }')
 #step 4
-# predictions = filter_2(search_sentence, parsed_array)
+# make video
 
 
