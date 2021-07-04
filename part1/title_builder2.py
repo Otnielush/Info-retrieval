@@ -123,9 +123,9 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
         for i in range(table.shape[1]):
             # Inverse Document Frequency
             IDF = (table[:, max(0, i - half):min(end, i + half)].sum(axis=1) / window) / array_freqs
-            IDF_log = np.log(IDF + 1)  #log transformation, +1 to remove negative values
-            table_appearance_freq[d][:,i] = IDF_log
-            mean_freq_inverted.append(np.mean(IDF_log))
+            IDF_bm = 5*IDF/(IDF+4)  #BM25 transformation, k = 4
+            table_appearance_freq[d][:,i] = IDF_bm
+            mean_freq_inverted.append(np.mean(IDF_bm))
 
     mean_freq_inverted = np.mean(mean_freq_inverted)
     # print('\nmean limit', mean_freq_inverted)
