@@ -17,6 +17,7 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
         text = [text]
 
     # Remove punctuation
+    #
     print('\rRemoving punctuation. part 1 of 7', end=' '*10)
     text_parts = []
     text_parts_num = []
@@ -122,8 +123,8 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
         for i in range(table.shape[1]):
             # Inverse Document Frequency
             IDF = (table[:, max(0, i - half):min(end, i + half)].sum(axis=1) / window) / array_freqs
-            IDF_log = np.log(IDF + 1)
-            table_appearance_freq[d][:,i] = IDF_log  #log transformation, +1 to remove negative values
+            IDF_log = np.log(IDF + 1)  #log transformation, +1 to remove negative values
+            table_appearance_freq[d][:,i] = IDF_log
             mean_freq_inverted.append(np.mean(IDF_log))
 
     mean_freq_inverted = np.mean(mean_freq_inverted)

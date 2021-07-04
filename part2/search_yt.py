@@ -1,8 +1,10 @@
-import pytube
+from pytube import YouTube
+from os import rename, path, getcwd, remove, stat
+from requests import get
+Download_folder = path.abspath('.')+'\\downloads\\'
+
 import pandas as pd
-import numpy as np
 import youtubesearchpython as ys
-import datetime
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
@@ -70,3 +72,68 @@ class YT_searcher():
             return self.DFs
         else:
             return None
+
+
+
+# in: url youtube video
+# out: path to file, length of video
+def download_mp4(url, yt_obj=None):
+    if len(url) == 11:
+        urll = 'https://www.youtube.com/watch?v='+url
+    else:
+        urll = url
+
+    if yt_obj == None:
+        connects = 0
+        while connects < 3:
+            try:
+                yt_obj = YouTube(urll)
+                break
+
+            except:
+                connects += 1
+        if connects >= 3:
+            return '', 0
+
+
+    # checking if file already downloaded (not working)
+    # new_name = getcwd()+'\\downloads\\'+yt_obj.title+'.mp3'
+    # if path.isfile(new_name):
+    #     return new_name
+
+    yt_stream = yt_obj.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').asc().first()
+    end_name = 3
+
+    tries = 0
+    while tries <= 3:
+        try:
+            ytd = yt_stream.download(Download_folder)
+            break
+        except:
+            tries += 1
+
+    # failed to download
+    if tries >= 3:
+        try:
+            if stat(ytd).st_size <= 1:
+                remove(ytd)
+        except:
+            pass
+
+        return '', 0
+
+    # new_name = ytd[:-end_name]+'mp4'
+    # try:
+    #     if stat(ytd).st_size <= 1:
+    #         remove(ytd)
+    #     else:
+    #         try:
+    #             remove(new_name)
+    #         except:
+    #             pass
+    #         finally:
+    #             rename(ytd, new_name)
+    # except:
+    #     return '', 0
+
+    return ytd, int(yt_obj.length/60)

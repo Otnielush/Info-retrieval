@@ -11,7 +11,7 @@ else:
 print('Searching:', search_sentence)
 
 
-from search_yt import YT_searcher
+from search_yt import YT_searcher, download_mp4
 from title_filter import get_best_parts, build_plots
 
 
@@ -22,11 +22,15 @@ from part1.title_builder2 import build_subtitles
 MAX_VIDEOS_TO_PARSE = 2
 
 # step 1
+# This library uses native YouTube search.
+# Instead of searching, you can download the text of the video by ID:
+# df_subtitles = YT.download_subtitles(id)
 ids, df_subtitles = YT.search(search_sentence, MAX_VIDEOS_TO_PARSE)
 
 print('Videos found:', len(ids))
 
 # step 2
+#
 data = build_subtitles([list(df['text']) for df in df_subtitles], window=100, max_words=7, parse_text_parts=True)
 
 # step 3
@@ -37,4 +41,6 @@ print(f'{best_part = }\n{best_part_timings = }')
 #step 4
 # make video
 
+# downloading
+file_names, file_len = download_mp4(ids)
 
