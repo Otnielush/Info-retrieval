@@ -18,7 +18,7 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
 
     # Remove punctuation
     # Remove punctuation and punctuation marks. The tokenizer will give a better result
-    print('\rRemoving punctuation. part 1 of 7', end=' '*10)
+    print('\rRemoving punctuation. part 1 of 6', end=' '*10)
     text_parts = []
     text_parts_num = []
     for t in range(len(text)):
@@ -53,7 +53,7 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
 
     # dictionary
     # Create a bag of words and count them
-    print('\rBuilding dictionary of words. part 2 of 7', end=' '*10)
+    print('\rBuilding dictionary of words. part 2 of 6', end=' '*10)
     docs = []
     for doc in text:
         tt = doc.split(' ')
@@ -83,7 +83,7 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
     # If an error occurs and the download fails, then the word frequency among all documents is sent.
     # The ngrams downloader has a SQLite database and first checks if there are these words in the database,
     # if not, then it parses the Google site.
-    print('\rCalculating frequencies of words. part 3 of 7', end=' '*10)
+    print('\rCalculating frequencies of words. part 3 of 6', end=' '*10)
     total_words = sum(doc_words)
     dict_freq = dict()
     ngrams_freqs = ngrams.get_frequency(dict_words.keys())
@@ -106,7 +106,7 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
 
     # [num docs, word, possition in doc] => (0,1)
     # Where word appears in the word possitions in documents. axis X - words, axis Y - possition in document
-    print('\rTable word appearance. part 4 of 7', end=' '*10)
+    print('\rTable word appearance. part 4 of 6', end=' '*10)
     table_appearance = [np.zeros((len(dict_words), doc_len)) for doc_len in doc_words]
     for d,doc in enumerate(docs):
         possition = 0
@@ -121,7 +121,7 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
     # how much times word appears in the window of words in text
     # To divide the document into parts, we count TF IDF in the interval of 100 words (window)
     # to understand which words are key at a given interval
-    print(f'\rTable word appearance frequency in window({window}). part 5 of 7', end=' '*4)
+    print(f'\rTable word appearance frequency in window({window}). part 5 of 6', end=' '*4)
     table_appearance_freq = [np.zeros((table.shape[0], table.shape[1])) for table in table_appearance]
     mean_freq_inverted = []
     for d, table in enumerate(table_appearance):
@@ -138,15 +138,17 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
     # print('\nmean limit', mean_freq_inverted)
 
     # choising best words
-    #
-    print('\rTable word most appearance in window. part 6 of 7', end=' '*10)
-    table_most_appearance = [[[best for best in np.argsort(-step)[:max_words]] for step in doc.T] for doc in table_appearance_freq]
-    table_most_appearance_words = [[[row2word[ind] for ind in step] for step in doc] for doc in table_most_appearance]
+    # table_most_appearance = [[[best for best in np.argsort(-step)[:max_words]] for step in doc.T] for doc in table_appearance_freq]
+    # table_most_appearance_words = [[[row2word[ind] for ind in step] for step in doc] for doc in table_most_appearance]
 
 
     data = [{'app_freq':0, 'app_freq_f':0, 'most_app':0, 'most_words':0} for _ in range(len(docs))]
-    # save results to csv
-    print('\rPreparing datasets. part 7 of 7', end=' '*20)
+    # choising best words
+    # At each step of the segment, we take an estimate of the frequency of the n-th word (after sorting),
+    # where n is the number of words that we want to take for the title. We get the minimum frequency for n words.
+    # So we take the average estimate of the frequency of words in the document and choose the maximum of these two values.
+    # It turns out at each step we get up to n words with the maximum score for this step.
+    print('\rTable word most appearance in window. part 6 of 6', end=' '*10)
     for i,table in enumerate(table_appearance_freq):
         dataset = pd.DataFrame(table.T, columns=word2row.keys())
         # dataset.to_csv(f'result_words_{i}.csv', index=None)
@@ -161,15 +163,15 @@ def build_subtitles(text, window=None, max_words=10, parse_text_parts=True):
         data[i]['app_freq_f'] = dataset_filtered.fillna(0)
 
 
-    for i,table in enumerate(table_most_appearance):
-        dataset = pd.DataFrame(table, columns=[str(x) for x in range(1,max_words+1)])
-        # dataset.to_csv(f'result_best_ind_{i}.csv', index=None)
-        data[i]['most_app'] = dataset
-
-    for i,table in enumerate(table_most_appearance_words):
-        dataset = pd.DataFrame(table, columns=[str(x) for x in range(1,max_words+1)])
-        # dataset.to_csv(f'result_best_words_{i}.csv', index=None)
-        data[i]['most_words'] = dataset
+    # for i,table in enumerate(table_most_appearance):
+    #     dataset = pd.DataFrame(table, columns=[str(x) for x in range(1,max_words+1)])
+    #     # dataset.to_csv(f'result_best_ind_{i}.csv', index=None)
+    #     data[i]['most_app'] = dataset
+    #
+    # for i,table in enumerate(table_most_appearance_words):
+    #     dataset = pd.DataFrame(table, columns=[str(x) for x in range(1,max_words+1)])
+    #     # dataset.to_csv(f'result_best_words_{i}.csv', index=None)
+    #     data[i]['most_words'] = dataset
 
     if parse_text_parts:
         for i in range(len(data)):

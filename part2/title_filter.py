@@ -21,6 +21,8 @@ def get_best_parts(data, query, yt_subtitles=None):
     docs_num = len(data)
 
     # kmeans labels
+    # At the input, the classifier receives a table of n words with the highest score. The rest of the words are rated 0.
+    # Thus we divide the text into several parts according to their subject matter
     print('\rkmeans labels. part 1 of 4', end=' ' * 35)
     kmeans_labels = []
     n_clusters = 7
@@ -33,6 +35,7 @@ def get_best_parts(data, query, yt_subtitles=None):
         data[i]['labels'] = labels
 
     # grouping words in each group
+    # After K-means, we can analyze each group for the most frequent words.
     print('\rgrouping words in each group. part 2 of 4', end=' ' * 20)
     for i in range(docs_num):
         for k in range(n_clusters):
@@ -45,6 +48,8 @@ def get_best_parts(data, query, yt_subtitles=None):
     #             print('==', len(data[i][f'clus{i}_words']))
 
     # nlp similarity
+    # Using a neural network, we will compare the query vectors with each group to assess how similar they are.
+    # Estimate using the cosine of the angle vectors
     print('\rnlp similarity. part 3 of 4', end=' ' * 25)
     search_nlp = nlp(query)
     max_sim = -1
@@ -56,6 +61,8 @@ def get_best_parts(data, query, yt_subtitles=None):
                 max_sim = sim
 
     # from labels and similarity getting text parts
+    # Using the similarity score from the neural network, we select groups that are similar to our query.
+    # We select the intervals from the text that we need to cut and then connect into one video.
     limit = 0.6
     if limit > max_sim:
         limit = max_sim * 0.99

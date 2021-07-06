@@ -13,11 +13,10 @@ print('Searching:', search_sentence)
 
 from search_yt import YT_searcher, download_mp4
 from title_filter import get_best_parts, build_plots
+from title_builder import build_subtitles
 
 
-sys.path.append('..')
 YT = YT_searcher()
-from part1.title_builder2 import build_subtitles
 
 MAX_VIDEOS_TO_PARSE = 2
 
