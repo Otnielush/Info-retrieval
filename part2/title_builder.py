@@ -4,9 +4,11 @@ import re
 from spacy.lang.en import English
 nlp = English()
 
-from .ngrams import Word_Frequency
+import sys
+sys.path.append('..')
+from part1.ngrams import Word_Frequency
 ngrams = Word_Frequency()
-
+sys.path.append('part2')
 
 
 # IN: text: list of documents. Documents - string of list of words

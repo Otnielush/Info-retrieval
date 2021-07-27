@@ -4,7 +4,7 @@ import sys
 
 #read sentence to search from console
 if len(sys.argv) < 2:
-    print('Please write a search words like: "python main.py search words"')
+    print('Please write a search words like: python main.py "haredi child news"')
     exit()
 else:
     search_sentence = ' '.join(sys.argv[1:])
@@ -41,5 +41,9 @@ print(f'{best_part = }\n{best_part_timings = }')
 # make video
 
 # downloading
-file_names, file_len = download_mp4(ids)
-
+file_names, file_len = [], []
+for link in ids:
+    names, lens = download_mp4(link)
+    file_names.append(names)
+    file_len.append(lens)
+print(f'{file_names = }')

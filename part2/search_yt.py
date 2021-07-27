@@ -137,3 +137,7 @@ def download_mp4(url, yt_obj=None):
     #     return '', 0
 
     return ytd, int(yt_obj.length/60)
+
+
+if __name__ == '__main__':
+    files, lens = download_mp4('https://www.youtube.com/watch?v=SyHlFEQ9Jtc')

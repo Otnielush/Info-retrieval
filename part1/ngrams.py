@@ -27,7 +27,7 @@ class Word_Frequency():
         self.ngrams = {x[0]:x[1] for x in cur.fetchall()}
 
         self.tokens = set(self.ngrams.keys())
-        print('Ngrams base loaded')
+        print('Ngrams base loaded. Words in base:', len(self.tokens))
         con.close()
 
 
@@ -172,8 +172,8 @@ class Word_Frequency():
 
 if __name__ == '__main__':
     nn = Word_Frequency()
-    words = ['mother','whatever','sit','lots of','froglets','picks','wading','apart',
- 'from', 'one', 'say', 'goodbye']
+    words = ['mother','whatever','stream','lots of','froglets','picks','wading','apart',
+ 'from', 'one', 'say', 'goodbye', 'instruments']
     freqs = nn.get_frequency(words)
     print([a for a in zip(words, freqs)])
     print(nn._parse_frequency(words))
