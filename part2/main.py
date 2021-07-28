@@ -14,6 +14,7 @@ print('Searching:', search_sentence)
 from search_yt import YT_searcher, download_mp4
 from title_filter import get_best_parts, build_plots
 from title_builder import build_subtitles
+from concatenate_clips import make_clip
 
 
 YT = YT_searcher()
@@ -47,3 +48,6 @@ for link in ids:
     file_names.append(names)
     file_len.append(lens)
 print(f'{file_names = }')
+
+# building video file
+make_clip(file_names, file_len)
