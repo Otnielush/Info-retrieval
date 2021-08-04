@@ -1,13 +1,18 @@
-#!/usr/bin/python
+##!/usr/bin/python
 
 import sys
 
+TEST = False
+
 #read sentence to search from console
-if len(sys.argv) < 2:
+if len(sys.argv) < 2 and not TEST:
     print('Please write a search words like: python main.py "haredi child news"')
     exit()
 else:
-    search_sentence = ' '.join(sys.argv[1:])
+    if TEST:
+        search_sentence = 'haredi child news'
+    else:
+        search_sentence = ' '.join(sys.argv[1:])
 print('Searching:', search_sentence)
 
 
@@ -30,7 +35,7 @@ ids, df_subtitles = YT.search(search_sentence, MAX_VIDEOS_TO_PARSE)
 print('Videos found:', len(ids))
 
 # step 2
-#
+# output tables with frequencies of words and most frequently words
 data = build_subtitles([list(df['text']) for df in df_subtitles], window=100, max_words=7, parse_text_parts=True)
 
 # step 3
@@ -51,3 +56,4 @@ print(f'{file_names = }')
 
 # building video file
 make_clip(file_names, file_len)
+

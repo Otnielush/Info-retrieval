@@ -4,11 +4,8 @@ import re
 from spacy.lang.en import English
 nlp = English()
 
-import sys
-sys.path.append('..')
-from part1.ngrams import Word_Frequency
+from ngrams import Word_Frequency
 ngrams = Word_Frequency()
-sys.path.append('part2')
 
 
 # IN: text: list of documents. Documents - string of list of words
@@ -208,6 +205,7 @@ if __name__ == '__main__':
         file1 = pd.read_csv('../data_test/text.csv')
         file1 = list(file1['text'])
 
-    build_subtitles([file1], window=30, max_words=10)
-    print(ngrams)
+    result = build_subtitles([file1], window=30, max_words=10)
+    # print(ngrams)
+    print(result)
 

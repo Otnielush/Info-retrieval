@@ -1,6 +1,5 @@
 from pytube import YouTube
 from os import rename, path, getcwd, remove, stat
-from requests import get
 Download_folder = path.abspath('.')+'\\downloads\\'
 
 import pandas as pd
